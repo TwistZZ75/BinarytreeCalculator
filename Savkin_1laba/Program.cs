@@ -23,61 +23,82 @@ namespace RPN
 
             public binarytree add(string sourse_string)
             {
-                binarytree v = null;
                 Console.WriteLine(sourse_string);
                 string[] symb = sourse_string.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); //разбиваем строку по пробелам
-                for (int i = symb.Length - 1; i >= 0; i--)
+                Stack<binarytree> st = new Stack<binarytree>();
+                double num;
+                binarytree root = null;
+                for (int i = 0; i < symb.Length; i++)
                 {
-                    if (v == null)
+                    bool isNum = double.TryParse(symb[i], out num);
+                    if (isNum)
                     {
-                        v = CreateNode(symb[i], null, null);
+                        root = CreateNode(symb[i], null, null);
+                        st.Push(root);
                     }
                     else
                     {
-                        v.insert(symb[i]);
+                        root = CreateNode(symb[i], null, null);
+                        binarytree l, r;
+                        l = st.Pop();
+                        r = st.Pop();
+                        root.right = r;
+                        root.left = l;
+                        st.Push(root);
                     }
+                    //if (v == null)
+                    //{
+                    //    v = CreateNode(symb[i], null, null);
+                    //}
+                    //else
+                    //{
+                    //    v.insert(symb[i]);
+                    //}
                 }
-                return v;
+                root = st.Pop();
+                return root;
             }
 
             public void insert(string symb)
             {
-                double num;
-                double value = 0; 
-                bool isNum = double.TryParse(symb, out num);
-                if (right != null)
-                {
-                    if (double.TryParse(right.data, out value) == false)
-                    {
-                        value = Priority(right.data);
-                    }
-                    else if (double.TryParse(right.data, out value) == true)
-                    {
-                        value = Convert.ToDouble(right.data);
-                    }
-                }
-                if (num >= value)
-                {
-                    if (right == null)
-                    {
-                        right = CreateNode(symb, null, null);
-                    }
-                    else
-                    {
-                        right.insert(symb);
-                    }
-                }
-                else
-                {
-                    if (left == null)
-                    {
-                        left = CreateNode(symb, null, null);
-                    }
-                    else
-                    {
-                        left.insert(symb);
-                    }
-                }
+
+                //if(isNum == false)
+                //{
+                //    if (right == null)
+                //    {
+                //        right = CreateNode(symb, null, null);
+                //    }
+                //    else
+                //    {
+                //        left = CreateNode(symb, null, null);
+                //    }
+                //}
+                //if (isNum)
+                //{
+
+                //    if (num >= value)
+                //    {
+                //        if (right == null)
+                //        {
+                //            right = CreateNode(symb, null, null);
+                //        }
+                //        else
+                //        {
+                //            right.insert(symb);
+                //        }
+                //    }
+                //    else
+                //    {
+                //        if (left == null)
+                //        {
+                //            left = CreateNode(symb, null, null);
+                //        }
+                //        else
+                //        {
+                //            left.insert(symb);
+                //        }
+                //    }
+                //}
             }
         }
         static void Main(string[] source_strings)

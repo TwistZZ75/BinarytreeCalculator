@@ -45,7 +45,7 @@ namespace RPN
                 double num;
                 double value = 0; 
                 bool isNum = double.TryParse(symb, out num);
-                if (right != null || left != null)
+                if (right != null)
                 {
                     if (double.TryParse(right.data, out value) == false)
                     {
@@ -172,17 +172,17 @@ namespace RPN
                 case "(":
                     return 0;
                 case "~":
-                    return 40;
+                    return -1;
                 case "+": 
-                    return 37;
+                    return -4;
                 case "-": 
-                    return 38;
+                    return -3;
                 case "*": 
-                    return 39;
+                    return -2;
                 case "/": 
-                    return 39;
+                    return -2;
                 default: 
-                    return 40;
+                    return -1;
             }
         }
         //static void Polska(string source_string)

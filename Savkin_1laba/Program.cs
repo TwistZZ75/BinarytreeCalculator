@@ -20,6 +20,17 @@ namespace RPN
                 node.right = null;
                 return node;
             }
+            public class BNode
+            {
+                public int item;
+                public BNode right;
+                public BNode left;
+
+                public BNode(int item)
+                {
+                    this.item = item;
+                }
+            }
 
             public binarytree add(string sourse_string)
             {
@@ -38,72 +49,85 @@ namespace RPN
                     }
                     else
                     {
-                        root = CreateNode(symb[i], null, null);
-                        binarytree l, r;
-                        l = st.Pop();
-                        r = st.Pop();
-                        root.right = r;
-                        root.left = l;
-                        st.Push(root);
+                        if (symb[i] == "~")
+                        {
+                            binarytree unar_minus;
+                            unar_minus = st.Pop();
+                            unar_minus.data = unar_minus.data.Insert(0, "-");
+                            st.Push(unar_minus);
+                        }
+                        else
+                        {
+                            root = CreateNode(symb[i], null, null);
+                            binarytree l, r;
+                            l = st.Pop();
+                            r = st.Pop();
+                            root.right = r;
+                            root.left = l;
+                            st.Push(root);
+                        }
                     }
-                    //if (v == null)
-                    //{
-                    //    v = CreateNode(symb[i], null, null);
-                    //}
-                    //else
-                    //{
-                    //    v.insert(symb[i]);
-                    //}
                 }
                 root = st.Pop();
                 return root;
             }
 
-            public void insert(string symb)
+            public int calculate(binarytree root)
             {
+                int ans = 0;
+                if (root != null)
+                {
+                    calculate(root.left);
+                    calculate(root.right);
 
-                //if(isNum == false)
-                //{
-                //    if (right == null)
-                //    {
-                //        right = CreateNode(symb, null, null);
-                //    }
-                //    else
-                //    {
-                //        left = CreateNode(symb, null, null);
-                //    }
-                //}
-                //if (isNum)
-                //{
-
-                //    if (num >= value)
-                //    {
-                //        if (right == null)
-                //        {
-                //            right = CreateNode(symb, null, null);
-                //        }
-                //        else
-                //        {
-                //            right.insert(symb);
-                //        }
-                //    }
-                //    else
-                //    {
-                //        if (left == null)
-                //        {
-                //            left = CreateNode(symb, null, null);
-                //        }
-                //        else
-                //        {
-                //            left.insert(symb);
-                //        }
-                //    }
-                //}
+                    if (root.data == "+")
+                    {
+                        ans = Convert.ToInt32((root.left).data) + Convert.ToInt32((root.right).data);
+                        root.data = Convert.ToString(ans);
+                        root.left = null;
+                        root.right = null;
+                    }
+                    else if (root.data == "*")
+                    {
+                        ans = Convert.ToInt32((root.left).data) * Convert.ToInt32((root.right).data);
+                        root.data = Convert.ToString(ans);
+                        root.left = null;
+                        root.right = null;
+                    }
+                    else if (root.data == "-")
+                    {
+                        ans = Convert.ToInt32((root.right).data) - Convert.ToInt32((root.left).data);
+                        root.data = Convert.ToString(ans);
+                        root.left = null;
+                        root.right = null;
+                    }
+                    else if (root.data == "/")
+                    {
+                        if (Convert.ToInt32((root.left).data) != 0)
+                        {
+                            ans = Convert.ToInt32((root.right).data) / Convert.ToInt32((root.left).data);
+                            root.data = Convert.ToString(ans);
+                            root.left = null;
+                            root.right = null;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ошибка. Деление на ноль");
+                        }
+                    }
+                }
+                return ans;
             }
+            
+
         }
+
+
+
         static void Main(string[] source_strings)
         {
             binarytree str = new binarytree();
+            binarytree root = null;
             char x;
             string source_string;//исходная строка
             do
@@ -120,13 +144,15 @@ namespace RPN
                         Console.WriteLine("Введите выражение польской записью (12 ~ 4 + 5 *):");//"~" - унарный минус
                         source_string = Console.ReadLine();
                         source_string = Usual_to_Polska(source_string, x);
-                        str.add(source_string);
+                        root = str.add(source_string);
+                        Console.WriteLine(str.calculate(root));
                         break;
                     case '2':
                         Console.WriteLine("Введите выражение обычной записью (~ 12 + 4 * 5):");//"~" - унарный минус
                         source_string = Console.ReadLine();
                         source_string = Usual_to_Polska(source_string, x);
-                        str.add(source_string);
+                        root = str.add(source_string);
+                        Console.WriteLine(str.calculate(root));
                         break;
                     default:
                         break;
@@ -206,54 +232,5 @@ namespace RPN
                     return -1;
             }
         }
-        //static void Polska(string source_string)
-        //{
-        //    Stack<double> st = new Stack<double>();
-        //    //пример выражения(обрати внимание на пробелы!!!):12 4 +
-        //    string[] symb = source_string.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); //разбиваем строку по пробелам
-        //    foreach (var ch in symb)
-        //    {
-        //        double num;
-        //        bool isNum = double.TryParse(ch, out num);//проверяем текущий символ на то является он знаком или числом
-        //        if (isNum) //если число, помещаем в стек
-        //            st.Push(num);
-        //        else
-        //        {
-        //            double op2;
-        //            if (st.Count > 0)
-        //            {
-        //                switch (ch)
-        //                {
-        //                    case "+":
-        //                        st.Push(st.Pop() + st.Pop());
-        //                        break;
-        //                    case "*":
-        //                        st.Push(st.Pop() * st.Pop());
-        //                        break;
-        //                    case "-":
-        //                        op2 = st.Pop();//т.к. в вычитании важен порядок вычитания, то учитывая особенность стека,
-        //                                       //мы из второго числа должны вычесть первое, поэтому первое сохраняем в переменную
-        //                        st.Push(st.Pop() - op2);
-        //                        break;
-        //                    case "/":
-        //                        op2 = st.Pop();//то же что и в вычитании
-        //                        if (op2 != 0.0)
-        //                            st.Push(st.Pop() / op2);
-        //                        else
-        //                            Console.WriteLine("Ошибка. Деление на ноль");
-        //                        break;
-        //                    case "~":
-        //                        st.Push(st.Pop() * -1);//унарный минус
-        //                        break;
-        //                    default:
-        //                        Console.WriteLine("Ошибка. Неизвестная команда");//если неизвестный символ выводится сообщение
-        //                        break;
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    Console.WriteLine("Результат: " + st.Pop());
-        //}
     }
 }

@@ -123,23 +123,34 @@ namespace RPN
                 }
                 if (root.left != null)
                 {
-                    Console.SetCursorPosition(Console.WindowWidth / 2 - count_left, Console.WindowHeight / 2 + count_left);
+                    Console.SetCursorPosition(Console.WindowWidth / 2 - count_left - 2, Console.WindowHeight / 2 + count_left);
                     Console.WriteLine(root.left.data);
                     count_left += 2;
                     print_tree(root.left);
                     level++;
+                    if (level > 1)
+                    {
+                        Console.SetCursorPosition(Console.WindowWidth / 2 + count_left - 6, Console.WindowHeight / 2 + count_left - 2);
+                        Console.WriteLine(root.right.data);
+                        level = level - 1;
+                    }
                 }
                 if (root.right != null)
                 {
-                    if (level > 0)
-                    {
-                        Console.SetCursorPosition(Console.WindowWidth / 2 + count_right, Console.WindowHeight / 2 + count_right);
+                    //if (level - 1 > 0)
+                    //{
+                        Console.SetCursorPosition(Console.WindowWidth / 2 + count_right + 2, Console.WindowHeight / 2 + count_right);
                         Console.WriteLine(root.right.data);
-                    }
-                    Console.SetCursorPosition(Console.WindowWidth / 2 + count_right, Console.WindowHeight / 2 + count_right);
-                    Console.WriteLine(root.right.data);
-                    count_right += 2;
+                        count_right += 2;
+                    //}
                     print_tree(root.right);
+                    //level++;
+                    //if (level > 1)
+                    //{
+                    //    Console.SetCursorPosition(Console.WindowWidth / 2 + count_right, Console.WindowHeight / 2 + count_right - 2);
+                    //    Console.WriteLine(root.right.data);
+                    //    level = level - 1;
+                    //}
                 }
             }
         }

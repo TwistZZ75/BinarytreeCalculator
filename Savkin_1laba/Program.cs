@@ -3,126 +3,151 @@ using System.Collections.Generic;
 
 namespace RPN
 {
-    class Program
+    public partial class binarytree 
     {
-        public partial class binarytree
+        public string data { get; private set; }//?-обнуляемый тип данных(переменная может принимать значение null)
+                                                //get set - свойства экземпляра класса(что с ними можно делать)
+        public binarytree right { get; private set; }
+        public binarytree left { get; private set; }
+
+        int level = 0;
+        int count_left = 1;
+        int count_right = 1;
+         
+        public binarytree CreateNode(string value, binarytree left, binarytree right)
         {
-            public string data { get; private set; }//?-обнуляемый тип данных(переменная может принимать значение null)
-            //get set - свойства экземпляра класса(что с ними можно делать)
-            public binarytree right { get; private set; }
-            public binarytree left { get; private set; }
+            var node = new binarytree();
+            node.data = value;
+            node.left = null;
+            node.right = null;
+            return node;
+        }
 
-            public binarytree CreateNode(string value, binarytree left, binarytree right)
+        public binarytree add(string sourse_string)
+        {
+            Console.WriteLine(sourse_string);
+            string[] symb = sourse_string.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); //разбиваем строку по пробелам
+            Stack<binarytree> st = new Stack<binarytree>();
+            double num;
+            binarytree root = null;
+            for (int i = 0; i < symb.Length; i++)
             {
-                var node = new binarytree();
-                node.data = value;
-                node.left = null;
-                node.right = null;
-                return node;
-            }
-            public class BNode
-            {
-                public int item;
-                public BNode right;
-                public BNode left;
-
-                public BNode(int item)
+                bool isNum = double.TryParse(symb[i], out num);
+                if (isNum)
                 {
-                    this.item = item;
+                    root = CreateNode(symb[i], null, null);
+                    st.Push(root);
                 }
-            }
-
-            public binarytree add(string sourse_string)
-            {
-                Console.WriteLine(sourse_string);
-                string[] symb = sourse_string.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); //разбиваем строку по пробелам
-                Stack<binarytree> st = new Stack<binarytree>();
-                double num;
-                binarytree root = null;
-                for (int i = 0; i < symb.Length; i++)
+                else
                 {
-                    bool isNum = double.TryParse(symb[i], out num);
-                    if (isNum)
+                    if (symb[i] == "~")
                     {
-                        root = CreateNode(symb[i], null, null);
-                        st.Push(root);
+                        binarytree unar_minus;
+                        unar_minus = st.Pop();
+                        unar_minus.data = unar_minus.data.Insert(0, "-");
+                        st.Push(unar_minus);
                     }
                     else
                     {
-                        if (symb[i] == "~")
-                        {
-                            binarytree unar_minus;
-                            unar_minus = st.Pop();
-                            unar_minus.data = unar_minus.data.Insert(0, "-");
-                            st.Push(unar_minus);
-                        }
-                        else
-                        {
-                            root = CreateNode(symb[i], null, null);
-                            binarytree l, r;
-                            l = st.Pop();
-                            r = st.Pop();
-                            root.right = r;
-                            root.left = l;
-                            st.Push(root);
-                        }
+                        root = CreateNode(symb[i], null, null);
+                        binarytree l, r;
+                        l = st.Pop();
+                        r = st.Pop();
+                        root.right = r;
+                        root.left = l;
+                        st.Push(root);
                     }
                 }
-                root = st.Pop();
-                return root;
             }
-
-            public int calculate(binarytree root)
-            {
-                int ans = 0;
-                if (root != null)
-                {
-                    calculate(root.left);
-                    calculate(root.right);
-
-                    if (root.data == "+")
-                    {
-                        ans = Convert.ToInt32((root.left).data) + Convert.ToInt32((root.right).data);
-                        root.data = Convert.ToString(ans);
-                        root.left = null;
-                        root.right = null;
-                    }
-                    else if (root.data == "*")
-                    {
-                        ans = Convert.ToInt32((root.left).data) * Convert.ToInt32((root.right).data);
-                        root.data = Convert.ToString(ans);
-                        root.left = null;
-                        root.right = null;
-                    }
-                    else if (root.data == "-")
-                    {
-                        ans = Convert.ToInt32((root.right).data) - Convert.ToInt32((root.left).data);
-                        root.data = Convert.ToString(ans);
-                        root.left = null;
-                        root.right = null;
-                    }
-                    else if (root.data == "/")
-                    {
-                        if (Convert.ToInt32((root.left).data) != 0)
-                        {
-                            ans = Convert.ToInt32((root.right).data) / Convert.ToInt32((root.left).data);
-                            root.data = Convert.ToString(ans);
-                            root.left = null;
-                            root.right = null;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Ошибка. Деление на ноль");
-                        }
-                    }
-                }
-                return ans;
-            }
-            
-
+            root = st.Pop();
+            print_tree(root);
+            return root;
         }
 
+        public int calculate(binarytree root)
+        {
+            int ans = 0;
+            if (root != null)
+            {
+                calculate(root.left);
+                calculate(root.right);
 
+                if (root.data == "+")
+                {
+                    ans = Convert.ToInt32((root.left).data) + Convert.ToInt32((root.right).data);
+                    root.data = Convert.ToString(ans);
+                    root.left = null;
+                    root.right = null;
+                }
+                else if (root.data == "*")
+                {
+                    ans = Convert.ToInt32((root.left).data) * Convert.ToInt32((root.right).data);
+                    root.data = Convert.ToString(ans);
+                    root.left = null;
+                    root.right = null;
+                }
+                else if (root.data == "-")
+                {
+                    ans = Convert.ToInt32((root.right).data) - Convert.ToInt32((root.left).data);
+                    root.data = Convert.ToString(ans);
+                    root.left = null;
+                    root.right = null;
+                }
+                else if (root.data == "/")
+                {
+                    if (Convert.ToInt32((root.left).data) != 0)
+                    {
+                        ans = Convert.ToInt32((root.right).data) / Convert.ToInt32((root.left).data);
+                        root.data = Convert.ToString(ans);
+                        root.left = null;
+                        root.right = null;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ошибка. Деление на ноль");
+                    }
+                }
+            }
+            return ans;
+        }
+
+        public void print_tree(binarytree root)
+        {
+            if (root != null)
+            {
+                if (level == 0)
+                {
+                    Console.SetCursorPosition(Console.WindowWidth / 2 + level, Console.WindowHeight / 2 + level);
+                    Console.WriteLine(root.data);
+                    level++;
+                }
+                if (root.left != null)
+                {
+                    Console.SetCursorPosition(Console.WindowWidth / 2 - count_left, Console.WindowHeight / 2 + count_left);
+                    Console.WriteLine(root.left.data);
+                    count_left += 2;
+                    print_tree(root.left);
+                    level++;
+                }
+                if (root.right != null)
+                {
+                    if (level > 0)
+                    {
+                        Console.SetCursorPosition(Console.WindowWidth / 2 + count_right, Console.WindowHeight / 2 + count_right);
+                        Console.WriteLine(root.right.data);
+                    }
+                    Console.SetCursorPosition(Console.WindowWidth / 2 + count_right, Console.WindowHeight / 2 + count_right);
+                    Console.WriteLine(root.right.data);
+                    count_right += 2;
+                    print_tree(root.right);
+                }
+            }
+        }
+    }
+
+
+    class Program
+    {
 
         static void Main(string[] source_strings)
         {

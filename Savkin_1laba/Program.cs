@@ -113,6 +113,7 @@ namespace RPN
 
         public void print_tree(binarytree root)
         {
+            binarytree last_root = null;
             if (root != null)
             {
                 if (level == 0)
@@ -127,30 +128,25 @@ namespace RPN
                     Console.WriteLine(root.left.data);
                     count_left += 2;
                     print_tree(root.left);
-                    level++;
-                    if (level > 1)
-                    {
-                        Console.SetCursorPosition(Console.WindowWidth / 2 + count_left - 6, Console.WindowHeight / 2 + count_left - 2);
-                        Console.WriteLine(root.right.data);
-                        level = level - 1;
-                    }
+                    if(level < 3)
+                    last_root = root.left;
                 }
                 if (root.right != null)
                 {
-                    //if (level - 1 > 0)
-                    //{
+                    if (last_root == root.left)
+                    {
+                        Console.SetCursorPosition(Console.WindowWidth / 2 - count_left + 3, Console.WindowHeight / 2 + count_left - 2);
+                        level += 2;
+                        Console.WriteLine(root.right.data);
+                        print_tree(root.right);
+                    }
+                    else
+                    {
                         Console.SetCursorPosition(Console.WindowWidth / 2 + count_right + 2, Console.WindowHeight / 2 + count_right);
                         Console.WriteLine(root.right.data);
                         count_right += 2;
-                    //}
+                    }
                     print_tree(root.right);
-                    //level++;
-                    //if (level > 1)
-                    //{
-                    //    Console.SetCursorPosition(Console.WindowWidth / 2 + count_right, Console.WindowHeight / 2 + count_right - 2);
-                    //    Console.WriteLine(root.right.data);
-                    //    level = level - 1;
-                    //}
                 }
             }
         }

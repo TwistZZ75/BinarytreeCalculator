@@ -122,31 +122,35 @@ namespace RPN
                     Console.WriteLine(root.data);
                     level++;
                 }
-                if (root.left != null)
+                if (root.left != null && root.right != null)
                 {
-                    Console.SetCursorPosition(Console.WindowWidth / 2 - count_left - 2, Console.WindowHeight / 2 + count_left);
-                    Console.WriteLine(root.left.data);
-                    count_left += 2;
-                    print_tree(root.left);
-                    if(level < 3)
-                    last_root = root.left;
-                }
-                if (root.right != null)
-                {
-                    if (last_root == root.left)
+                    if (level == 1)
                     {
-                        Console.SetCursorPosition(Console.WindowWidth / 2 - count_left + 3, Console.WindowHeight / 2 + count_left - 2);
-                        level += 2;
+                        Console.SetCursorPosition(Console.WindowWidth / 2 - 4, Console.WindowHeight / 2 + level);
+                        Console.WriteLine(root.left.data);
+                        Console.SetCursorPosition(Console.WindowWidth / 2 + 4, Console.WindowHeight / 2 + level);
                         Console.WriteLine(root.right.data);
+                    }
+                    if (level == 2)
+                    {
+                        Console.SetCursorPosition(Console.WindowWidth / 2 - 6, Console.WindowHeight / 2 + level);
+                        Console.WriteLine(root.left.data);
+                        Console.SetCursorPosition(Console.WindowWidth / 2 - 2, Console.WindowHeight / 2 + level);
+                        Console.WriteLine(root.right.data);
+                    }
+                    if (level == 3)
+                    {
+                        Console.SetCursorPosition(Console.WindowWidth / 2 - 8, Console.WindowHeight / 2 + level);
+                        Console.WriteLine(root.left.data);
+                        Console.SetCursorPosition(Console.WindowWidth / 2 - 4, Console.WindowHeight / 2 + level);
+                        Console.WriteLine(root.right.data);
+                    }
+                    if (root.left.left != null || root.left.right != null || root.right.left != null || root.right.right != null)
+                    {
+                        level++;
+                        print_tree(root.left);
                         print_tree(root.right);
                     }
-                    else
-                    {
-                        Console.SetCursorPosition(Console.WindowWidth / 2 + count_right + 2, Console.WindowHeight / 2 + count_right);
-                        Console.WriteLine(root.right.data);
-                        count_right += 2;
-                    }
-                    print_tree(root.right);
                 }
             }
         }

@@ -9,7 +9,6 @@ namespace RPN
                                                 //get set - свойства экземпляра класса(что с ними можно делать)
         public binarytree right { get; private set; }
         public binarytree left { get; private set; }
-        int item;
 
         public binarytree CreateNode(string value, binarytree left, binarytree right)
         {
@@ -23,13 +22,14 @@ namespace RPN
         public binarytree add(string sourse_string)
         {
             Console.WriteLine(sourse_string);
+            string alphabet = "ABCDEFGabcdefg";
             string[] symb = sourse_string.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); //разбиваем строку по пробелам
             Stack<binarytree> st = new Stack<binarytree>();
             double num;
             binarytree root = null;
             for (int i = 0; i < symb.Length; i++)
             {
-                if (symb[i] == "A" || symb[i] == "B")
+                if (alphabet.Contains(symb[i]))
                 {
                     root = CreateNode(symb[i], null, null);
                     st.Push(root);
@@ -63,6 +63,7 @@ namespace RPN
         public string calculate(binarytree root)
         {
             string ans = null;
+            Stack<string> st = new Stack<string>();
             if (root != null)
             {
                 calculate(root.left);
@@ -70,7 +71,21 @@ namespace RPN
 
                 if (root.data == "+")
                 {
+                    if (root.left.data.Contains(root.right.data))
+                    {
+                        root.left.data = root.left.data.Replace('-' + root.right.data, null);
+                        root.right.data = null;
+                    }
+                    else if(root.right.data.Contains(root.left.data))
+                    {
+                        root.right.data = root.right.data.Replace('-' + root.left.data, null);
+                        root.left.data = null;
+                    }
                     ans = root.left.data + root.right.data;
+                    if(ans == "")
+                    {
+                        ans = "0";
+                    }
                     root.data = Convert.ToString(ans);
                     root.left = null;
                     root.right = null;
@@ -182,18 +197,22 @@ namespace RPN
                     case '0':
                         break;
                     case '1':
-                        Console.WriteLine("Введите выражение польской записью (12 ~ 4 + 5 *):");//"~" - унарный минус
+                        Console.WriteLine("Введите выражение польской записью:");//"~" - унарный минус
                         source_string = Console.ReadLine();
                         source_string = Usual_to_Polska(source_string, x);
                         root = str.add(source_string);
+                        Console.WriteLine();
                         Console.WriteLine(str.calculate(root));
+                        Console.WriteLine();
                         break;
                     case '2':
-                        Console.WriteLine("Введите выражение обычной записью (~ 12 + 4 * 5):");//"~" - унарный минус
+                        Console.WriteLine("Введите выражение обычной записью:");//"~" - унарный минус
                         source_string = Console.ReadLine();
                         source_string = Usual_to_Polska(source_string, x);
                         root = str.add(source_string);
+                        Console.WriteLine();
                         Console.WriteLine(str.calculate(root));
+                        Console.WriteLine();
                         break;
                     default:
                         break;
@@ -206,10 +225,10 @@ namespace RPN
             Stack<string> stz = new Stack<string>();//стек для знаков
             string[] symb = source_string.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); //разбиваем строку по пробелам
             string newStr = string.Empty;//присваиваем строке значение пустой (аналог int x = 0;), чтобы отладчик не ругался на не присвоенное значение
-            string s = string.Empty;
+            string alphabet = "ABCDEFGabcdefg";
             for (int i = 0; i < symb.Length; i++)
             {
-                if (symb[i] == "A" || symb[i] == "B") //если число, помещаем в строку
+                if (alphabet.Contains(symb[i])) //если число, помещаем в строку
                     newStr += symb[i] + " ";
                 else
                 {
@@ -238,8 +257,6 @@ namespace RPN
         {
             switch (s)
             {
-                case "(":
-                    return 0;
                 case "~":
                     return 4;
                 case "+":

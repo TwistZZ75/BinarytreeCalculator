@@ -29,8 +29,7 @@ namespace RPN
             binarytree root = null;
             for (int i = 0; i < symb.Length; i++)
             {
-                bool isNum = double.TryParse(symb[i], out num);
-                if (isNum)
+                if (symb[i] == "A" || symb[i] == "B")
                 {
                     root = CreateNode(symb[i], null, null);
                     st.Push(root);
@@ -61,9 +60,9 @@ namespace RPN
             return root;
         }
 
-        public int calculate(binarytree root)
+        public string calculate(binarytree root)
         {
-            int ans = 0;
+            string ans = null;
             if (root != null)
             {
                 calculate(root.left);
@@ -71,38 +70,10 @@ namespace RPN
 
                 if (root.data == "+")
                 {
-                    ans = Convert.ToInt32((root.left).data) + Convert.ToInt32((root.right).data);
+                    ans = root.left.data + root.right.data;
                     root.data = Convert.ToString(ans);
                     root.left = null;
                     root.right = null;
-                }
-                else if (root.data == "*")
-                {
-                    ans = Convert.ToInt32((root.left).data) * Convert.ToInt32((root.right).data);
-                    root.data = Convert.ToString(ans);
-                    root.left = null;
-                    root.right = null;
-                }
-                else if (root.data == "-")
-                {
-                    ans = Convert.ToInt32((root.right).data) - Convert.ToInt32((root.left).data);
-                    root.data = Convert.ToString(ans);
-                    root.left = null;
-                    root.right = null;
-                }
-                else if (root.data == "/")
-                {
-                    if (Convert.ToInt32((root.left).data) != 0)
-                    {
-                        ans = Convert.ToInt32((root.right).data) / Convert.ToInt32((root.left).data);
-                        root.data = Convert.ToString(ans);
-                        root.left = null;
-                        root.right = null;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Ошибка. Деление на ноль");
-                    }
                 }
             }
             return ans;
@@ -188,46 +159,6 @@ namespace RPN
             if (right < 0) right = left + s.Length;
             while (Console.CursorLeft < right) Console.Write(s);
         }
-        //binarytree last_root = null;
-        //if (root != null)
-        //{
-        //    if (level == 0)
-        //    {
-        //        Console.SetCursorPosition(Console.WindowWidth / 2 + level, Console.WindowHeight / 2 + level);
-        //        Console.WriteLine(root.data);
-        //        level++;
-        //    }
-        //    if (root.left != null && root.right != null)
-        //    {
-        //        if (level == 1)
-        //        {
-        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 4, Console.WindowHeight / 2 + level);
-        //            Console.WriteLine(root.left.data);
-        //            Console.SetCursorPosition(Console.WindowWidth / 2 + 4, Console.WindowHeight / 2 + level);
-        //            Console.WriteLine(root.right.data);
-        //        }
-        //        if (level == 2)
-        //        {
-        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 6, Console.WindowHeight / 2 + level);
-        //            Console.WriteLine(root.left.data);
-        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 2, Console.WindowHeight / 2 + level);
-        //            Console.WriteLine(root.right.data);
-        //        }
-        //        if (level == 3)
-        //        {
-        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 7, Console.WindowHeight / 2 + level);
-        //            Console.WriteLine(root.left.data);
-        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 3, Console.WindowHeight / 2 + level);
-        //            Console.WriteLine(root.right.data);
-        //        }
-        //        if (root.left.left != null || root.left.right != null || root.right.left != null || root.right.right != null)
-        //        {
-        //            level++;
-        //            print_tree(root.left);
-        //            print_tree(root.right);
-        //        }
-        //    }
-        //}
     }
 
 
@@ -278,27 +209,10 @@ namespace RPN
             string s = string.Empty;
             for (int i = 0; i < symb.Length; i++)
             {
-                double num;
-                bool isNum = double.TryParse(symb[i], out num);//проверяем текущий символ на то является он знаком или числом
-                if (isNum) //если число, помещаем в строку
+                if (symb[i] == "A" || symb[i] == "B") //если число, помещаем в строку
                     newStr += symb[i] + " ";
                 else
                 {
-                    if (symb[i] == "(")
-                    {
-                        stz.Push(symb[i]);
-                    }
-                    else if (symb[i] == ")")
-                    {
-                        s = stz.Pop();
-                        while (s != "(")
-                        {
-                            newStr += s + " ";
-                            s = stz.Pop();
-                        }
-                    }
-                    else
-                    {
                         if (stz.Count > 0)
                         {
                             if (Priority(symb[i]) <= Priority(stz.Peek())) //если приоритет знака в строке ниже или равен приоритету знака на вершине стека
@@ -311,13 +225,11 @@ namespace RPN
 
                         if (symb[i] == "~" && newStr != string.Empty && x == '1')
                             newStr += stz.Pop() + " ";
-                    }
                 }
             }
 
             while (stz.Count > 0)
                 newStr += stz.Pop() + " ";//запись знаков из стека в строку(они выстроены по приоритету в итоге)
-            //Console.WriteLine(newStr);
             return newStr;
         }
 
@@ -332,12 +244,6 @@ namespace RPN
                     return 4;
                 case "+":
                     return 1;
-                case "-":
-                    return 2;
-                case "*":
-                    return 3;
-                case "/":
-                    return 3;
                 default:
                     return 4;
             }

@@ -3,17 +3,14 @@ using System.Collections.Generic;
 
 namespace RPN
 {
-    public partial class binarytree 
+    public partial class binarytree
     {
         public string data { get; private set; }//?-обнуляемый тип данных(переменная может принимать значение null)
                                                 //get set - свойства экземпляра класса(что с ними можно делать)
         public binarytree right { get; private set; }
         public binarytree left { get; private set; }
+        int item;
 
-        int level = 0;
-        int count_left = 1;
-        int count_right = 1;
-         
         public binarytree CreateNode(string value, binarytree left, binarytree right)
         {
             var node = new binarytree();
@@ -110,50 +107,127 @@ namespace RPN
             }
             return ans;
         }
-
-        public void print_tree(binarytree root)
+        class rootInfo
         {
-            binarytree last_root = null;
-            if (root != null)
+            public binarytree Node;
+            public string Text;
+            public int StartPos;
+            public int Size { get { return Text.Length; } }
+            public int EndPos { get { return StartPos + Size; } set { StartPos = value - Size; } }
+            public rootInfo Parent, Left, Right;
+        }
+        public void print_tree(binarytree root, string textFormat = "0", int spacing = 1, int topMargin = 2, int leftMargin = 2)
+        {
+            if (root == null)
+                return;
+            int rootTop = Console.CursorTop + topMargin;
+            var last = new List<rootInfo>();
+            var next = root;
+            for (int level = 0; next != null; level++)
             {
-                if (level == 0)
+                var item = new rootInfo { Node = next, Text = next.data };
+                if (level < last.Count)
                 {
-                    Console.SetCursorPosition(Console.WindowWidth / 2 + level, Console.WindowHeight / 2 + level);
-                    Console.WriteLine(root.data);
-                    level++;
+                    item.StartPos = last[level].EndPos + spacing;
+                    last[level] = item;
                 }
-                if (root.left != null && root.right != null)
+                else
                 {
-                    if (level == 1)
+                    item.StartPos = leftMargin;
+                    last.Add(item);
+                }
+                if (level > 0)
+                {
+                    item.Parent = last[level - 1];
+                    if (next == item.Parent.Node.left)
                     {
-                        Console.SetCursorPosition(Console.WindowWidth / 2 - 4, Console.WindowHeight / 2 + level);
-                        Console.WriteLine(root.left.data);
-                        Console.SetCursorPosition(Console.WindowWidth / 2 + 4, Console.WindowHeight / 2 + level);
-                        Console.WriteLine(root.right.data);
+                        item.Parent.Left = item;
+                        item.EndPos = Math.Max(item.EndPos, item.Parent.StartPos - 1);
                     }
-                    if (level == 2)
+                    else
                     {
-                        Console.SetCursorPosition(Console.WindowWidth / 2 - 6, Console.WindowHeight / 2 + level);
-                        Console.WriteLine(root.left.data);
-                        Console.SetCursorPosition(Console.WindowWidth / 2 - 2, Console.WindowHeight / 2 + level);
-                        Console.WriteLine(root.right.data);
+                        item.Parent.Right = item;
+                        item.StartPos = Math.Max(item.StartPos, item.Parent.EndPos + 1);
                     }
-                    if (level == 3)
+                }
+                next = next.left ?? next.right;
+                for (; next == null; item = item.Parent)
+                {
+                    int top = rootTop + 2 * level;
+                    Print(item.Text, top, item.StartPos);
+                    if (item.Left != null)
                     {
-                        Console.SetCursorPosition(Console.WindowWidth / 2 - 8, Console.WindowHeight / 2 + level);
-                        Console.WriteLine(root.left.data);
-                        Console.SetCursorPosition(Console.WindowWidth / 2 - 4, Console.WindowHeight / 2 + level);
-                        Console.WriteLine(root.right.data);
+                        Print("/", top + 1, item.Left.EndPos);
+                        Print("_", top, item.Left.EndPos + 1, item.StartPos);
                     }
-                    if (root.left.left != null || root.left.right != null || root.right.left != null || root.right.right != null)
+                    if (item.Right != null)
                     {
-                        level++;
-                        print_tree(root.left);
-                        print_tree(root.right);
+                        Print("_", top, item.EndPos, item.Right.StartPos - 1);
+                        Print("\\", top + 1, item.Right.StartPos - 1);
+                    }
+                    if (--level < 0) break;
+                    if (item == item.Parent.Left)
+                    {
+                        item.Parent.StartPos = item.EndPos + 1;
+                        next = item.Parent.Node.right;
+                    }
+                    else
+                    {
+                        if (item.Parent.Left == null)
+                            item.Parent.EndPos = item.StartPos - 1;
+                        else
+                            item.Parent.StartPos += (item.StartPos - 1 - item.Parent.EndPos) / 2;
                     }
                 }
             }
+            Console.SetCursorPosition(0, rootTop + 2 * last.Count - 1);
         }
+        private static void Print(string s, int top, int left, int right = -1)
+        {
+            Console.SetCursorPosition(left, top);
+            if (right < 0) right = left + s.Length;
+            while (Console.CursorLeft < right) Console.Write(s);
+        }
+        //binarytree last_root = null;
+        //if (root != null)
+        //{
+        //    if (level == 0)
+        //    {
+        //        Console.SetCursorPosition(Console.WindowWidth / 2 + level, Console.WindowHeight / 2 + level);
+        //        Console.WriteLine(root.data);
+        //        level++;
+        //    }
+        //    if (root.left != null && root.right != null)
+        //    {
+        //        if (level == 1)
+        //        {
+        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 4, Console.WindowHeight / 2 + level);
+        //            Console.WriteLine(root.left.data);
+        //            Console.SetCursorPosition(Console.WindowWidth / 2 + 4, Console.WindowHeight / 2 + level);
+        //            Console.WriteLine(root.right.data);
+        //        }
+        //        if (level == 2)
+        //        {
+        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 6, Console.WindowHeight / 2 + level);
+        //            Console.WriteLine(root.left.data);
+        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 2, Console.WindowHeight / 2 + level);
+        //            Console.WriteLine(root.right.data);
+        //        }
+        //        if (level == 3)
+        //        {
+        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 7, Console.WindowHeight / 2 + level);
+        //            Console.WriteLine(root.left.data);
+        //            Console.SetCursorPosition(Console.WindowWidth / 2 - 3, Console.WindowHeight / 2 + level);
+        //            Console.WriteLine(root.right.data);
+        //        }
+        //        if (root.left.left != null || root.left.right != null || root.right.left != null || root.right.right != null)
+        //        {
+        //            level++;
+        //            print_tree(root.left);
+        //            print_tree(root.right);
+        //        }
+        //    }
+        //}
     }
 
 
@@ -225,15 +299,15 @@ namespace RPN
                     }
                     else
                     {
-                            if (stz.Count > 0)
+                        if (stz.Count > 0)
+                        {
+                            if (Priority(symb[i]) <= Priority(stz.Peek())) //если приоритет знака в строке ниже или равен приоритету знака на вершине стека
+                                                                           //тогда записываем знак с вершины стека в строку
                             {
-                                if (Priority(symb[i]) <= Priority(stz.Peek())) //если приоритет знака в строке ниже или равен приоритету знака на вершине стека
-                                                                               //тогда записываем знак с вершины стека в строку
-                                {
-                                    newStr += stz.Pop() + " ";
-                                }
+                                newStr += stz.Pop() + " ";
                             }
-                            stz.Push(symb[i]);//в противном случае сохраняем знак из строки в стек
+                        }
+                        stz.Push(symb[i]);//в противном случае сохраняем знак из строки в стек
 
                         if (symb[i] == "~" && newStr != string.Empty && x == '1')
                             newStr += stz.Pop() + " ";
@@ -242,30 +316,30 @@ namespace RPN
             }
 
             while (stz.Count > 0)
-                  newStr += stz.Pop() + " ";//запись знаков из стека в строку(они выстроены по приоритету в итоге)
-           // Console.WriteLine(newStr);
+                newStr += stz.Pop() + " ";//запись знаков из стека в строку(они выстроены по приоритету в итоге)
+            //Console.WriteLine(newStr);
             return newStr;
         }
 
 
-    static public int Priority(string s)
+        static public int Priority(string s)
         {
             switch (s)
             {
                 case "(":
                     return 0;
                 case "~":
-                    return -1;
-                case "+": 
-                    return -4;
-                case "-": 
-                    return -3;
-                case "*": 
-                    return -2;
-                case "/": 
-                    return -2;
-                default: 
-                    return -1;
+                    return 4;
+                case "+":
+                    return 1;
+                case "-":
+                    return 2;
+                case "*":
+                    return 3;
+                case "/":
+                    return 3;
+                default:
+                    return 4;
             }
         }
     }

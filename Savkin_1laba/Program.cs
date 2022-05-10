@@ -3,36 +3,76 @@ using System.Collections.Generic;
 
 namespace RPN
 {
-    public partial class logic
+    public partial class binarytree
     {
+        public string data { get; private set; }//?-обнуляемый тип данных(переменная может принимать значение null)
+                                                //get set - свойства экземпляра класса(что с ними можно делать)
+        public binarytree right { get; private set; }
+        public binarytree left { get; private set; }
 
-        public string add(string sourse_string)
+        public binarytree CreateNode(string value, binarytree left, binarytree right)
+        {
+            var node = new binarytree();
+            node.data = value;
+            node.left = null;
+            node.right = null;
+            return node;
+        }
+
+        public binarytree add(string sourse_string)
         {
             Console.WriteLine(sourse_string);
             string alphabet = "ABCDEFGabcdefg";
             string[] symb = sourse_string.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); //разбиваем строку по пробелам
-            Stack<string> st = new Stack<string>();
-            double num;
-            string root = null;
+            Stack<binarytree> st = new Stack<binarytree>();
+            string num = string.Empty;
+            binarytree root = null;
             for (int i = 0; i < symb.Length; i++)
             {
                 if (alphabet.Contains(symb[i]))
                 {
-                    root = symb[i];
+                    string x = symb[i];
+                    switch(x)
+                    {
+                        case "A":
+                            num = "1";
+                            break;
+                        case "a":
+                            num = "1";
+                            break;
+                        case "b":
+                            num = "2";
+                            break;
+                        case "B":
+                            num = "2";
+                            break;
+                        case "C":
+                            num = "3";
+                            break;
+                        case "c":
+                            num = "3";
+                            break;
+                    }
+                    root = CreateNode(num, null, null);
                     st.Push(root);
                 }
                 else
                 {
                     if (symb[i] == "~")
                     {
-                        string unar_minus;
+                        binarytree unar_minus;
                         unar_minus = st.Pop();
-                        unar_minus = unar_minus.Insert(0, "-");
+                        unar_minus.data = unar_minus.data.Insert(0, "-");
                         st.Push(unar_minus);
                     }
                     else
                     {
-                        root = st.Pop() + " + " + st.Pop();
+                        root = CreateNode(symb[i], null, null);
+                        binarytree l, r;
+                        l = st.Pop();
+                        r = st.Pop();
+                        root.right = r;
+                        root.left = l;
                         st.Push(root);
                     }
                 }
@@ -41,18 +81,35 @@ namespace RPN
             return root;
         }
 
-        public string calculate(string root)
+        public int calculate(binarytree root)
         {
-            return root;
+            int ans = 0;
+            Stack<string> st = new Stack<string>();
+            if (root != null)
+            {
+                calculate(root.left);
+                calculate(root.right);
+
+                if (root.data == "+")
+                {
+                    ans = Convert.ToInt32((root.left).data) + Convert.ToInt32((root.right).data);
+                    root.data = Convert.ToString(ans);
+                    root.left = null;
+                    root.right = null;
+                }
+            }
+            return ans;
         }
     }
+
+
     class Program
     {
 
         static void Main(string[] source_strings)
         {
-            logic str = new logic();
-            string root = null;
+            binarytree str = new binarytree();
+            binarytree root = null;
             char x;
             string source_string;//исходная строка
             do
@@ -69,7 +126,9 @@ namespace RPN
                         Console.WriteLine("Введите выражение польской записью:");//"~" - унарный минус
                         source_string = Console.ReadLine();
                         source_string = Usual_to_Polska(source_string, x);
+                        root = str.add(source_string);
                         Console.WriteLine();
+                        Console.WriteLine(str.calculate(root));
                         Console.WriteLine();
                         break;
                     case '2':
@@ -78,7 +137,8 @@ namespace RPN
                         source_string = Usual_to_Polska(source_string, x);
                         root = str.add(source_string);
                         Console.WriteLine();
-                        Console.WriteLine(root);
+                        Console.WriteLine(str.calculate(root));
+                        Console.WriteLine();
                         break;
                     default:
                         break;
@@ -98,18 +158,18 @@ namespace RPN
                     newStr += symb[i] + " ";
                 else
                 {
-                        if (stz.Count > 0)
+                    if (stz.Count > 0)
+                    {
+                        if (Priority(symb[i]) <= Priority(stz.Peek())) //если приоритет знака в строке ниже или равен приоритету знака на вершине стека
+                                                                       //тогда записываем знак с вершины стека в строку
                         {
-                            if (Priority(symb[i]) <= Priority(stz.Peek())) //если приоритет знака в строке ниже или равен приоритету знака на вершине стека
-                                                                           //тогда записываем знак с вершины стека в строку
-                            {
-                                newStr += stz.Pop() + " ";
-                            }
-                        }
-                        stz.Push(symb[i]);//в противном случае сохраняем знак из строки в стек
-
-                        if (symb[i] == "~" && newStr != string.Empty && x == '1')
                             newStr += stz.Pop() + " ";
+                        }
+                    }
+                    stz.Push(symb[i]);//в противном случае сохраняем знак из строки в стек
+
+                    if (symb[i] == "~" && newStr != string.Empty && x == '1')
+                        newStr += stz.Pop() + " ";
                 }
             }
 

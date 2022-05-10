@@ -21,7 +21,6 @@ namespace RPN
 
         public binarytree add(string sourse_string)
         {
-            Console.WriteLine(sourse_string);
             string alphabet = "ABCDEFGabcdefg";
             string[] symb = sourse_string.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); //разбиваем строку по пробелам
             Stack<binarytree> st = new Stack<binarytree>();
@@ -52,13 +51,31 @@ namespace RPN
                         case "c":
                             num = "3";
                             break;
+                        case "D":
+                            num = "4";
+                            break;
+                        case "d":
+                            num = "4";
+                            break;
+                        case "E":
+                            num = "5";
+                            break;
+                        case "e":
+                            num = "5";
+                            break;
+                        case "F":
+                            num = "6";
+                            break;
+                        case "f":
+                            num = "6";
+                            break;
                     }
                     root = CreateNode(num, null, null);
                     st.Push(root);
                 }
                 else
                 {
-                    if (symb[i] == "~")
+                    if (symb[i] == "!")
                     {
                         binarytree unar_minus;
                         unar_minus = st.Pop();
@@ -123,21 +140,35 @@ namespace RPN
                     case '0':
                         break;
                     case '1':
-                        Console.WriteLine("Введите выражение польской записью:");//"~" - унарный минус
+                        Console.WriteLine("Введите выражение польской записью:");//"!" - унарный минус
                         source_string = Console.ReadLine();
                         source_string = Usual_to_Polska(source_string, x);
                         root = str.add(source_string);
                         Console.WriteLine();
-                        Console.WriteLine(str.calculate(root));
+                        if (str.calculate(root) != 0)
+                        {
+                            Console.WriteLine("Невозможно вывести резулятивный ноль");
+                        }
+                        else 
+                        {
+                            Console.WriteLine("Возможно вывести резулятивный ноль");
+                        }
                         Console.WriteLine();
                         break;
                     case '2':
-                        Console.WriteLine("Введите выражение обычной записью:");//"~" - унарный минус
+                        Console.WriteLine("Введите выражение обычной записью:");//"!" - унарный минус
                         source_string = Console.ReadLine();
                         source_string = Usual_to_Polska(source_string, x);
                         root = str.add(source_string);
                         Console.WriteLine();
-                        Console.WriteLine(str.calculate(root));
+                        if (str.calculate(root) != 0)
+                        {
+                            Console.WriteLine("Невозможно вывести резулятивный ноль");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Возможно вывести резулятивный ноль");
+                        }
                         Console.WriteLine();
                         break;
                     default:
@@ -168,7 +199,7 @@ namespace RPN
                     }
                     stz.Push(symb[i]);//в противном случае сохраняем знак из строки в стек
 
-                    if (symb[i] == "~" && newStr != string.Empty && x == '1')
+                    if (symb[i] == "!" && newStr != string.Empty && x == '1')
                         newStr += stz.Pop() + " ";
                 }
             }
@@ -183,7 +214,7 @@ namespace RPN
         {
             switch (s)
             {
-                case "~":
+                case "!":
                     return 4;
                 case "+":
                     return 1;

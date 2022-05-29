@@ -217,17 +217,22 @@ namespace RPN
                 {
                     if (perms[i].Contains("-" + perms[j]))
                     {
-                        if (i > 1)
+                        perms.Remove(perms[i]);
+                        perms.Remove(perms[j - 1]);
+                        if (perms.Count == 0)
                         {
-                            perms.Remove(perms[i]);
-                            perms.Remove(perms[j - 1]);
-                            j = 0;
+                            break;
                         }
+                        j = 0;
                     }
                     if (perms[i].Contains(perms[j]) && perms[i] != perms[j])
                     {
                         perms.Remove(perms[i]);
-                        perms.Remove(perms[j]);
+                        perms.Remove(perms[j - 1]);
+                        if (perms.Count == 0)
+                        {
+                            break;
+                        }
                         j = 0;
                     }
                     else

@@ -198,7 +198,7 @@ namespace RPN
                     default:
                         break;
                 }
-            } while (x != '0');
+            } while (x != '1');
         }
 
         static string diz_calc(string source_string)
@@ -210,7 +210,7 @@ namespace RPN
             {
                 perms.Add(symb[i]);
             }
-            for (int i = 0; i < perms.Count - 1; i++)
+            for (int i = 0; i < perms.Count; i++)
             {
                 int j = 0;
                 do
@@ -218,7 +218,14 @@ namespace RPN
                     if (perms[i].Contains("-" + perms[j]))
                     {
                         perms.Remove(perms[i]);
-                        perms.Remove(perms[j - 1]);
+                        if (j == 0)
+                        {
+                            perms.Remove(perms[j]);
+                        }
+                        else
+                        {
+                            perms.Remove(perms[j - 1]);
+                        }
                         if (perms.Count == 0)
                         {
                             break;
@@ -228,7 +235,14 @@ namespace RPN
                     if (perms[i].Contains(perms[j]) && perms[i] != perms[j])
                     {
                         perms.Remove(perms[i]);
-                        perms.Remove(perms[j - 1]);
+                        if (j == 0)
+                        {
+                            perms.Remove(perms[j]);
+                        }
+                        else
+                        {
+                            perms.Remove(perms[j - 1]);
+                        }
                         if (perms.Count == 0)
                         {
                             break;
